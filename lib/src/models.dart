@@ -42,12 +42,3 @@ class Sagitta {
   @override
   int get hashCode => Object.hash(current, target);
 }
-
-enum GraphType {
-  undirected('Undirected'),
-  directed('Directed');
-
-  final String label;
-
-  const GraphType(this.label);
-}

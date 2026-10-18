@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'graph_controller.dart';
-import 'models.dart';
 import 'theme.dart';
 
 const _editorPadding = EdgeInsets.symmetric(vertical: 5);
@@ -17,7 +16,6 @@ class GraphDataMenu extends StatefulWidget {
 class _GraphDataMenuState extends State<GraphDataMenu> {
   late final TextEditingController _textEditingController;
   int _linesCount = 1;
-  GraphType _graphType = GraphType.undirected;
 
   @override
   void initState() {
@@ -53,23 +51,6 @@ class _GraphDataMenuState extends State<GraphDataMenu> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Wrap(
-          spacing: 8,
-          children: [
-            for (final type in GraphType.values)
-              ChoiceChip(
-                label: Text(type.label),
-                selected: _graphType == type,
-                showCheckmark: false,
-                selectedColor: AppColors.primary,
-                labelStyle: TextStyle(
-                  color: _graphType == type ? Colors.white : null,
-                ),
-                onSelected: (_) => setState(() => _graphType = type),
-              ),
-          ],
-        ),
-        const SizedBox(height: 12),
         const Text('Graph Data:'),
         SizedBox(
           height: 350,
