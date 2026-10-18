@@ -10,7 +10,8 @@ class GraphView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final graph = Provider.of<GraphController>(context, listen: false);
+    final graph = Provider.of<GraphController>(context, listen: false)
+      ..box = const Rect.fromLTRB(20, 20, 778, 778);
 
     return Container(
       decoration: BoxDecoration(
@@ -19,20 +20,14 @@ class GraphView extends StatelessWidget {
       ),
       width: 800,
       height: 800,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          graph.box = (Offset.zero & constraints.biggest).deflate(20);
-
-          return GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            dragStartBehavior: DragStartBehavior.down,
-            onPanDown: (details) => graph.startDrag(details.localPosition),
-            onPanUpdate: (details) => graph.drag(details.delta),
-            onPanEnd: (_) => graph.endDrag(),
-            onPanCancel: graph.endDrag,
-            child: CustomPaint(painter: GraphPainter(graph)),
-          );
-        },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        dragStartBehavior: DragStartBehavior.down,
+        onPanDown: (details) => graph.startDrag(details.localPosition),
+        onPanUpdate: (details) => graph.drag(details.delta),
+        onPanEnd: (_) => graph.endDrag(),
+        onPanCancel: graph.endDrag,
+        child: CustomPaint(painter: GraphPainter(graph)),
       ),
     );
   }

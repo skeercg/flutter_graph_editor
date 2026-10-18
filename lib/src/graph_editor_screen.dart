@@ -17,14 +17,18 @@ class GraphEditorScreen extends StatelessWidget {
             backgroundColor: AppColors.primary,
           ),
           body: const Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GraphDataMenu(),
-                SizedBox(width: 30),
-                GraphView(),
-              ],
+            child: SingleChildScrollView(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GraphDataMenu(),
+                    SizedBox(width: 30),
+                    GraphView(),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
