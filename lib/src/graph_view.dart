@@ -1,35 +1,47 @@
-import 'dart:math';
-
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'graph_controller.dart';
-import 'models.dart';
 import 'theme.dart';
 
-class Graph extends StatelessWidget {
-  const Graph({super.key});
+class GraphView extends StatelessWidget {
+  const GraphView({super.key});
 
   @override
-  Widget build(BuildContext context) => Consumer<GraphController>(
-        builder: (context, graph, child) => Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.primary),
-          ),
-          width: 800,
-          height: 800,
-          child: CustomPaint(
-            painter: GraphPainter(graph.edges),
-          ),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final graph = Provider.of<GraphController>(context, listen: false);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.primary),
+      ),
+      width: 800,
+      height: 800,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          graph.box = (Offset.zero & constraints.biggest).deflate(20);
+
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            dragStartBehavior: DragStartBehavior.down,
+            onPanDown: (details) => graph.startDrag(details.localPosition),
+            onPanUpdate: (details) => graph.drag(details.delta),
+            onPanEnd: (_) => graph.endDrag(),
+            onPanCancel: graph.endDrag,
+            child: CustomPaint(painter: GraphPainter(graph)),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class GraphPainter extends CustomPainter {
-  final List<Edge> edges;
+  final GraphController graph;
 
-  const GraphPainter(this.edges);
+  const GraphPainter(this.graph) : super(repaint: graph);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -43,46 +55,26 @@ class GraphPainter extends CustomPainter {
       ..strokeWidth = 2
       ..style = PaintingStyle.fill;
 
-    final vertices = <int>[];
-
-    for (final edge in edges) {
-      if (!vertices.contains(edge.x) && edge.x != null) {
-        vertices.add(edge.x!);
-      }
-      if (!vertices.contains(edge.y) && edge.y != null) {
-        vertices.add(edge.y!);
-      }
-    }
-
-    final coordinates = calculatePolygonVertices(
-      vertices,
-      Offset(size.width / 2, size.height / 2),
-      size.width / 3,
-      vertices.length,
-    );
-
-    for (final vertex in vertices) {
-      canvas.drawCircle(coordinates[vertex]!, 20, vertexPaint);
-    }
-
     final path = Path();
 
-    for (var i = 0; i < edges.length; i++) {
-      final x = edges[i].x;
-      final y = edges[i].y;
-
-      if (x == null || y == null) continue;
+    for (final edge in graph.edges) {
+      final source = graph.positionOf(edge.source);
+      final target = graph.positionOf(edge.target);
+      final control = graph.controlPoint(edge);
 
       path
-        ..moveTo(coordinates[x]!.dx, coordinates[x]!.dy)
-        ..lineTo(coordinates[y]!.dx, coordinates[y]!.dy);
+        ..moveTo(source.dx, source.dy)
+        ..quadraticBezierTo(control.dx, control.dy, target.dx, target.dy);
     }
 
     canvas.drawPath(path, edgePaint);
 
-    for (final vertex in vertices) {
+    for (final vertex in graph.vertices) {
+      final position = graph.positionOf(vertex);
+      canvas.drawCircle(position, GraphController.vertexRadius, vertexPaint);
+
       final textSpan = TextSpan(
-        text: vertex.toString(),
+        text: vertex.label.toString(),
         style: AppFonts.font18,
       );
 
@@ -92,30 +84,17 @@ class GraphPainter extends CustomPainter {
       )..layout();
 
       final textOffset = Offset(
-        coordinates[vertex]!.dx - textPainter.width / 2,
-        coordinates[vertex]!.dy - textPainter.height / 2,
+        position.dx - textPainter.width / 2,
+        position.dy - textPainter.height / 2,
       );
 
-      textPainter.paint(canvas, textOffset);
+      textPainter
+        ..paint(canvas, textOffset)
+        ..dispose();
     }
   }
 
   @override
   bool shouldRepaint(covariant GraphPainter oldDelegate) =>
-      oldDelegate.edges != edges;
-
-  Map<int, Offset> calculatePolygonVertices(
-      List<int> vertices, Offset center, double radius, int n) {
-    final coordinates = <int, Offset>{};
-    final angle = 2 * pi / n;
-
-    for (var i = 0; i < n; i++) {
-      final theta = i * angle;
-      final x = center.dx + radius * cos(theta);
-      final y = center.dy + radius * sin(theta);
-      coordinates.putIfAbsent(vertices[i], () => Offset(x, y));
-    }
-
-    return coordinates;
-  }
+      oldDelegate.graph != graph;
 }

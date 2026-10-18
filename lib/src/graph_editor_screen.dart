@@ -23,7 +23,7 @@ class GraphEditorScreen extends StatelessWidget {
               children: [
                 GraphDataMenu(),
                 SizedBox(width: 30),
-                Graph(),
+                GraphView(),
               ],
             ),
           ),

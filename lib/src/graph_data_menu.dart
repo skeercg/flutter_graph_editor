@@ -28,8 +28,8 @@ class _GraphDataMenuState extends State<GraphDataMenu> {
           _linesCount = _textEditingController.text.split('\n').length;
 
           final edges = _textEditingController.text.split('\n').map((e) {
-            final vertices = e.split(' ').map(int.tryParse);
-            return Edge(vertices.first, vertices.last);
+            final vertices = e.split(' ').map(int.tryParse).whereType<int>();
+            return (vertices.firstOrNull, vertices.elementAtOrNull(1));
           }).toList();
 
           Provider.of<GraphController>(context, listen: false).setEdges(edges);
@@ -79,7 +79,7 @@ class _GraphDataMenuState extends State<GraphDataMenu> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  color: AppColors.seondary,
+                  color: AppColors.secondary,
                   width: 40,
                   constraints: const BoxConstraints(minHeight: 350),
                   padding: _editorPadding.copyWith(right: 10),
