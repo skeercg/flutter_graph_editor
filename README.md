@@ -1,16 +1,6 @@
-# graph_editor
+### Force-directed graph editor
 
-A new Flutter project.
+<img width="960" height="540" alt="graph_demo" src="https://github.com/user-attachments/assets/6a51d43e-6927-4eb7-8651-3ab226aae8ae" />
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
